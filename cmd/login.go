@@ -1,18 +1,3 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -25,6 +10,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
 	"os"
+	"strings"
 	"syscall"
 )
 
@@ -38,12 +24,15 @@ var loginCmd = &cobra.Command{
 		fmt.Print("Username: ")
 		username, _ := reader.ReadString('\n')
 
+		username = strings.TrimSpace(username)
+
 		fmt.Print("Password: ")
 		bytePassword, err := terminal.ReadPassword(syscall.Stdin)
 		if err != nil {
 			fmt.Println("failed to get password")
 		}
 		password := string(bytePassword)
+		fmt.Printf("\n")
 
 		resp, err := makeLoginRequest(username, password)
 		if err != nil {
@@ -71,6 +60,12 @@ var loginCmd = &cobra.Command{
 				tokenDetails.RefreshTokenExp = cookie.Expires
 			}
 		}
+
+		err = db.DeleteAuthTokens()
+		if err != nil {
+			return
+		}
+
 		err = db.PutAuthTokens(tokenDetails)
 		if err != nil {
 			fmt.Printf("Error saving auth tokens into mountup local db: %s\n", err)
@@ -82,8 +77,7 @@ var loginCmd = &cobra.Command{
 }
 
 func init() {
-	// DISABLED
-	//rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(loginCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -97,7 +91,7 @@ func init() {
 }
 
 func makeLoginRequest(username string, password string) (*http.Response, error) {
-	url := "http://localhost:8080/login"
+	url := "http://api.mountup.io:8080/login"
 
 	reqBody, err := json.Marshal(map[string]string{
 		"username": username,

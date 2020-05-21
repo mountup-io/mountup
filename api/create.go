@@ -22,7 +22,7 @@ type CreateVMForUserAccountResponseStruct struct {
 }
 
 func MakeCreateVMRequest(clientName string) (*VM, *PrivateKey, error) {
-	client := graphql.NewClient("http://localhost:8080/graphql")
+	client := graphql.NewClient("http://api.mountup.io:8080/graphql")
 
 	// make a request
 	req := graphql.NewRequest(`
@@ -134,7 +134,7 @@ func getAuthToken() (string, error) {
 }
 
 func makeRefreshRequest(refreshToken string) (*http.Response, error) {
-	url := "http://localhost:8080/refresh"
+	url := "http://api.mountup.io:8080/refresh"
 
 	reqBody, err := json.Marshal(map[string]string{
 		"refresh_token": refreshToken,

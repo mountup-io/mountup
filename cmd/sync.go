@@ -1,29 +1,14 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
 	"errors"
 	"fmt"
 	"github.com/mountup-io/mountup/api"
+	"github.com/spf13/cobra"
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/spf13/cobra"
+	"strings"
 )
 
 // syncCmd represents the sync command
@@ -32,45 +17,88 @@ var syncCmd = &cobra.Command{
 		if len(args) < 1 {
 			return errors.New("requires a clientname")
 		}
-		if len(args) > 1 {
-			return errors.New("too many arguments, only one clientname is required")
+		stringSlice := strings.FieldsFunc(args[0], Split)
+		if len(stringSlice) != 1 && len(stringSlice) != 3 {
+			return errors.New("invalid syntax, see `mountup help sync` for more details")
+		}
+		if len(args) > 3 {
+			return errors.New("too many arguments")
+		}
+		if args[0] != "push" && args[0] != "pull" {
+			return errors.New("first arg must be either `push` or `pull`")
 		}
 		return nil
 	},
-	Use:   "sync <clientname>",
-	Short: "Syncs files in your ~/mountup folder with your remote client",
-	Long:  ``,
+	Use:   "sync <push/pull> <servername>:<directory_on_remote>",
+	Short: "Syncs files in your ~/mountup/servername folder with your remote server",
+	Long: `sync <push/pull> <servername>
+syncs ~/mountup/servername directory with your mountup instances or own servers
+
+sync <push/pull> username@remote_host:directory_on_remote <ssh_key_path>
+syncs with your own servers
+
+sync push will upload files from ~/mountup/<servername> to the remote server before local syncing
+
+sync pull downloads files from the remote server to ~/mountup/<servername>
+`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//fmt.Printf("syncing on client: %s\n", args[0])
-		//
-		//s := spinner.New(spinner.CharSets[26], 100*time.Millisecond)
-		//s.Start()
-		//time.Sleep(1 * time.Second)
-		//s.Stop()
-		//
-		//fmt.Printf("%s sync engaged.\n", args[0])
-		//
-		//return
+		// Parse input
+		// Tokenize
+		stringSlice := strings.FieldsFunc(args[1], Split)
 
-		db := api.NewDB()
-		host, err := db.GetHostnameForClientname(args[0])
-		if err != nil {
-			//Either table or client with this name doesn't exist
-			fmt.Printf("virtual machine named %s not found.\nTo create a client run:\n\tmountup create %s\n", args[0], args[0])
-			return
+		var servername string
+		var username string
+		var host string
+		var destDir string
+		var pkeyDir string
+
+		if len(stringSlice) == 1 || len(stringSlice) == 2 {
+			username = "ubuntu"
+			servername = stringSlice[0]
+
+			if len(stringSlice) == 1 {
+				destDir = "~"
+			} else {
+				destDir = stringSlice[1]
+			}
+
+			db := api.NewDB()
+
+			var err error
+			host, err = db.GetHostnameForClientname(servername)
+			if err != nil {
+				//Either table or client with this name doesn't exist
+				fmt.Printf("virtual machine named %s not found.\nTo create a client run:\n\tmountup create %s\n", servername, servername)
+				return
+			}
+
+			homeDir, _ := os.UserHomeDir()
+			pkeyDir = filepath.Join(homeDir, ".mountup/keys", servername+".pem")
+
+		} else if len(stringSlice) == 3 {
+			username = stringSlice[0]
+			host = stringSlice[1]
+			destDir = stringSlice[2]
+			pkeyDir = args[1]
+			servername = host
 		}
-
-		homeDir, _ := os.UserHomeDir()
-		pkeyDir := filepath.Join(homeDir, ".mountup/keys", args[0]+".pem")
 
 		shellCmd := &exec.Cmd{
-			Path:   "/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh",
-			Args:   []string{"/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh", "ubuntu@" + host, pkeyDir},
+			Path: "/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh",
+			Args: []string{
+				"/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh",
+				username + "@" + host,
+				destDir,
+				pkeyDir,
+				servername,
+				args[0],
+			},
+			Stdin:  os.Stdin,
 			Stdout: os.Stdout,
-			Stderr: os.Stdout,
+			Stderr: os.Stderr,
 		}
 
-		err = shellCmd.Start()
+		err := shellCmd.Start()
 		if err != nil {
 			return
 		}
@@ -79,6 +107,8 @@ var syncCmd = &cobra.Command{
 		if err != nil {
 			return
 		}
+
+		fmt.Println("Hi this exited")
 
 		return
 	},
@@ -96,4 +126,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// syncCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func Split(r rune) bool {
+	return r == ':' || r == '@'
 }

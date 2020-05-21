@@ -1,18 +1,3 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -21,6 +6,7 @@ import (
 	"github.com/mountup-io/mountup/api"
 	"github.com/shiena/ansicolor"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"log"
 	"os"
@@ -103,12 +89,25 @@ var sshCmd = &cobra.Command{
 		session.Stdin = os.Stdin
 
 		modes := ssh.TerminalModes{
-			ssh.ECHO:  0, // Disable echoing
-			ssh.IGNCR: 1, // Ignore CR on input.
+			ssh.ECHO:          1,     // Disable echoing
+			ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
+			ssh.TTY_OP_OSPEED: 14400, // output speed = 14.4kbaud
+		}
+
+		fileDescriptor := int(os.Stdin.Fd())
+		originalState, err := terminal.MakeRaw(fileDescriptor)
+		if err != nil {
+			log.Fatalf("request for pseudo terminal failed: %s", err)
+		}
+		defer terminal.Restore(fileDescriptor, originalState)
+
+		termWidth, termHeight, err := terminal.GetSize(fileDescriptor)
+		if err != nil {
+			log.Fatalf("request for pseudo terminal failed: %s", err)
 		}
 
 		// Request pseudo terminal
-		if err := session.RequestPty("xterm-256color", 80, 40, modes); err != nil {
+		if err := session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
 			log.Fatalf("request for pseudo terminal failed: %s", err)
 		}
 
@@ -122,14 +121,14 @@ var sshCmd = &cobra.Command{
 			if e, ok := err.(*ssh.ExitError); ok {
 				switch e.ExitStatus() {
 				case 130:
-					fmt.Print("Session ended")
+					fmt.Printf("Connection to %s closed.\n", host)
 					return
 				}
 			}
 			fmt.Errorf("ssh: %s", err)
 			return
 		}
-		fmt.Printf("Connection to %s closed.\n", host)
+		fmt.Printf("Connection to %s closed.", host)
 		return
 	},
 }
