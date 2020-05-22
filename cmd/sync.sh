@@ -14,11 +14,9 @@ mkdir -p "$WORK_DIR"
 
 if [ "$5" = "push" ]; then
   # push files
-  echo "push"
   rsync "${WORK_DIR}" -azP --exclude=".*" -e "ssh -i $3" "$1":"$2"
 else
   # pull files
-  echo "pull"
   # shellcheck disable=SC2115
   rm -rf "${WORK_DIR}/*"
   rsync -azP --exclude=".*" -e "ssh -i $3" "$1":"$2" "${WORK_DIR}"

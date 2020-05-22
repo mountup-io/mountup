@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mountup-io/mountup/api"
 	"github.com/spf13/cobra"
+	"go/build"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -83,10 +84,15 @@ sync pull downloads files from the remote server to ~/mountup/<servername>
 			servername = host
 		}
 
+		goPath := os.Getenv("GOPATH")
+		if goPath == "" {
+			goPath = build.Default.GOPATH
+		}
+
 		shellCmd := &exec.Cmd{
-			Path: "/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh",
+			Path: goPath + "/src/github.com/mountup-io/mountup/cmd/sync.sh",
 			Args: []string{
-				"/Users/danielwang/go/src/github.com/mountup-io/mountup/cmd/sync.sh",
+				goPath + "/src/github.com/mountup-io/mountup/cmd/sync.sh",
 				username + "@" + host,
 				destDir,
 				pkeyDir,
