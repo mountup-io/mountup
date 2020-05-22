@@ -1,15 +1,15 @@
 ## Mountup
 
-Hi, and welcome to the Mountup CLI repo. This project is in alpha and
+Hi, and welcome to the Mountup CLI repo. This project is in **alpha** and
 very much explorative.
 
 Mountup is a command-line utility that syncs code on remote
 machines to your local filesystem. You edit locally, with all your
-best tooling, and see your changes synced remotely.
+favorite tooling, and see your changes synced remotely.
 
 ### Installation
 
-Currently only OSX and Linux are supported.
+Currently **only OSX and Linux** are supported.
 
 ```bash
 brew update
@@ -50,7 +50,7 @@ Provision a new server
 create <servername>
 ```
 
-Now get to work
+Off to the races!
 ```bash
 mountup sync <push/pull> <servername>:<directory_on_remote>
 ```
