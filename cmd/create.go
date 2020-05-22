@@ -16,13 +16,8 @@ import (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create <servername>",
-	Short: "Create mountup server that is named clientname",
-	Long: `Create mountup server that is named clientname
-create <clientname>
-creates a new mountup provisioned virtual machine as your remote server
-`,
-	//create username@remote_host:destination_directory <optional_ssh_key_path>
-	//creates a client that connects to an existing remote server
+	Short: "Creates a new mountup provisioned virtual machine as your remote server",
+	Long:  `Creates a new mountup provisioned virtual machine as your remote server named <servername>`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("setting up your ssh keys")
 		fmt.Println("provisioning your new virtual machine...")
@@ -36,7 +31,6 @@ creates a new mountup provisioned virtual machine as your remote server
 			return
 		}
 
-		// Save the private key
 		err = util.SavePrivateKeyToFS(pkey)
 		if err != nil {
 			fmt.Printf("Error saving private key: %s\n", err)
@@ -68,14 +62,4 @@ creates a new mountup provisioned virtual machine as your remote server
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
