@@ -12,8 +12,7 @@ favorite tooling, and see your changes synced remotely.
 Currently **only OSX and Linux** are supported.
 
 ```bash
-brew update
-brew install mountup
+brew install mountup-io/mountup/mountup
 ```
 
 ### How does it work?
