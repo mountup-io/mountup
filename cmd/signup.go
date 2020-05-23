@@ -13,8 +13,8 @@ import (
 // signupCmd represents the signup command
 var signupCmd = &cobra.Command{
 	Use:   "signup",
-	Short: "Sign up a new account",
-	Long:  `Sign up a new account`,
+	Short: "sign up a new account",
+	Long:  `sign up a new account`,
 	Run: func(cmd *cobra.Command, args []string) {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Username: ")

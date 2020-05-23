@@ -12,6 +12,8 @@ import (
 	"strings"
 )
 
+var isPush bool
+
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Args: func(cmd *cobra.Command, args []string) error {
@@ -19,33 +21,26 @@ var syncCmd = &cobra.Command{
 			return errors.New("requires a clientname")
 		}
 		stringSlice := strings.FieldsFunc(args[0], Split)
-		if len(stringSlice) != 1 && len(stringSlice) != 3 {
+		if len(stringSlice) != 1 && len(stringSlice) != 2 {
 			return errors.New("invalid syntax, see `mountup help sync` for more details")
 		}
-		if len(args) > 3 {
+		if len(args) > 2 {
 			return errors.New("too many arguments")
-		}
-		if args[0] != "push" && args[0] != "pull" {
-			return errors.New("first arg must be either `push` or `pull`")
 		}
 		return nil
 	},
-	Use:   "sync <push/pull> <servername>:<directory_on_remote>",
-	Short: "Syncs files in your ~/mountup/servername folder with your remote server",
-	Long: `sync <push/pull> <servername>
-syncs ~/mountup/servername directory with your mountup instances or own servers
+	Use:   "sync <servername>:<directory_on_remote>",
+	Short: "syncs files in your ~/mountup/<servername> folder with your remote server",
+	Long: `sync <servername>
+	syncs ~/mountup/<servername> directory with your mountup instances or own servers
 
-sync <push/pull> username@remote_host:directory_on_remote <ssh_key_path>
-syncs with your own servers
-
-sync push will upload files from ~/mountup/<servername> to the remote server before local syncing
-
-sync pull downloads files from the remote server to ~/mountup/<servername>
+sync username@remote_host:directory_on_remote <ssh_key_path>
+	syncs files from the remote server to ~/mountup/<servername>
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Parse input
 		// Tokenize
-		stringSlice := strings.FieldsFunc(args[1], Split)
+		stringSlice := strings.FieldsFunc(args[0], Split)
 
 		var servername string
 		var username string
@@ -89,6 +84,11 @@ sync pull downloads files from the remote server to ~/mountup/<servername>
 			goPath = build.Default.GOPATH
 		}
 
+		pushOrPulllString := "pull"
+		if isPush {
+			pushOrPulllString = "push"
+		}
+
 		shellCmd := &exec.Cmd{
 			Path: goPath + "/src/github.com/mountup-io/mountup/cmd/sync.sh",
 			Args: []string{
@@ -97,7 +97,7 @@ sync pull downloads files from the remote server to ~/mountup/<servername>
 				destDir,
 				pkeyDir,
 				servername,
-				args[0],
+				pushOrPulllString,
 			},
 			Stdin:  os.Stdin,
 			Stdout: os.Stdout,
@@ -121,6 +121,8 @@ sync pull downloads files from the remote server to ~/mountup/<servername>
 }
 
 func init() {
+	syncCmd.Flags().BoolVarP(&isPush, "push", "p", false, "push files from ~/mountup/<servername> before syncing ")
+
 	rootCmd.AddCommand(syncCmd)
 }
 

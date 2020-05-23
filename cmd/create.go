@@ -16,20 +16,22 @@ import (
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create <servername>",
-	Short: "Creates a new mountup provisioned virtual machine as your remote server",
-	Long:  `Creates a new mountup provisioned virtual machine as your remote server named <servername>`,
+	Short: "creates a new mountup provisioned virtual machine as your remote server",
+	Long:  `creates a new mountup provisioned virtual machine as your remote server named <servername>`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("setting up your ssh keys")
-		fmt.Println("provisioning your new virtual machine...")
 
 		s := spinner.New(spinner.CharSets[36], 100*time.Millisecond)
 		s.Start()
+
+		fmt.Println("provisioning your new virtual machine...")
 
 		vm, pkey, err := api.MakeCreateVMRequest(args[0])
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+
+		fmt.Println("setting up ssh keys")
 
 		err = util.SavePrivateKeyToFS(pkey)
 		if err != nil {

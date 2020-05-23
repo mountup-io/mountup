@@ -99,7 +99,7 @@ func getAuthToken() (string, error) {
 
 		resp, err := makeRefreshRequest(refreshToken)
 		if err != nil {
-			fmt.Println("error making login request")
+			fmt.Println("Please login first")
 			return "", err
 		}
 
@@ -130,7 +130,7 @@ func getAuthToken() (string, error) {
 	}
 
 	// Otherwise fail and tell user to relogin
-	return "", errors.New("auth tokens expired, please relogin")
+	return "", errors.New("Please login first")
 }
 
 func makeRefreshRequest(refreshToken string) (*http.Response, error) {

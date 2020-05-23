@@ -33,7 +33,7 @@ func PublicKeyFile(file string) (ssh.AuthMethod, error) {
 var sshCmd = &cobra.Command{
 	Use:   "ssh <clientname>",
 	Short: "ssh into your virtual machine",
-	Long:  ``,
+	Long:  `ssh into your virtual machine`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return errors.New("requires a clientname")
@@ -45,7 +45,6 @@ var sshCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Should check if table exists, and it there's an error
-
 		db := api.NewDB()
 		host, err := db.GetHostnameForClientname(args[0])
 		if err != nil {

@@ -17,8 +17,8 @@ import (
 // loginCmd represents the login command
 var loginCmd = &cobra.Command{
 	Use:   "login",
-	Short: "Login to your mountup account",
-	Long:  `Login to your mountup account`,
+	Short: "login to your mountup account",
+	Long:  `login to your mountup account`,
 	Run: func(cmd *cobra.Command, args []string) {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Username: ")

@@ -16,11 +16,11 @@ var rootCmd = &cobra.Command{
 	Use:   "mountup",
 	Short: "mountup command line client",
 	Long: `mountup is a code syncing tool used with remote machines.
-It lets you write code remotely but from the comfort of your own IDEs with local performance.`,
+Write code remotely from the comfort of your own IDEs with local performance.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hi! Welcome to the better way to develop on remote machines!\nPlease take a look at --help for what this can do!")
+		fmt.Println("Hi! Welcome to the faster way to develop on remote machines!\nPlease take a look at --help for more info.")
 	},
 }
 
