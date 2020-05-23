@@ -43,7 +43,7 @@ mountup login
 ```
 
 Provision a new server
->Currently an [AWS EC2 Instance](https://aws.amazon.com/ec2/)
+>Currently we provide one free [AWS EC2 Instance](https://aws.amazon.com/ec2/) for alpha users
 
 ```bash
 create <servername>
