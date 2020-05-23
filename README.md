@@ -24,13 +24,13 @@ folder. Any local file changes are synced right away to the remote ones.
 Existing remote code -> Local
 
 ```bash
-mountup sync pull username@remote_host:directory_on_remote <ssh_key_path>
+mountup sync username@remote_host:directory_on_remote <ssh_key_path>
 ```
 
 Local -> Existing remote code
 
 ```bash
-mountup sync push username@remote_host:directory_on_remote <ssh_key_path>
+mountup sync --push username@remote_host:directory_on_remote <ssh_key_path>
 ```
 ---
 
@@ -51,5 +51,5 @@ create <servername>
 
 Off to the races!
 ```bash
-mountup sync <push/pull> <servername>:<directory_on_remote>
+mountup sync <servername>:<directory_on_remote>
 ```
