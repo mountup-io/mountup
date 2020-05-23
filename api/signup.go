@@ -15,7 +15,7 @@ type MakeSignUpRequestStruct struct {
 }
 
 func MakeSignUpRequest(username string, email string, password string) error {
-	client := graphql.NewClient("http://api.mountup.io:8080/graphql")
+	client := graphql.NewClient("http://api.mountup.io/graphql")
 
 	// make a request
 	req := graphql.NewRequest(`

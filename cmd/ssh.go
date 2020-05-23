@@ -73,13 +73,15 @@ var sshCmd = &cobra.Command{
 
 		conn, err := ssh.Dial("tcp", host+":22", config)
 		if err != nil {
-			panic("Failed to dial: " + err.Error())
+			fmt.Printf("ssh: connection to %s port 22 refused\n", host)
+			return
 		}
 		defer conn.Close()
 
 		session, err := conn.NewSession()
 		if err != nil {
-			panic("Failed to create session: " + err.Error())
+			fmt.Printf("ssh: connection to %s port 22 refused\n", host)
+			return
 		}
 		defer session.Close()
 
