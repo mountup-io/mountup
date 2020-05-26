@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"github.com/machinebox/graphql"
+	"github.com/mountup-io/mountup/constants"
 	"log"
 )
 
@@ -15,7 +16,7 @@ type MakeSignUpRequestStruct struct {
 }
 
 func MakeSignUpRequest(username string, email string, password string) error {
-	client := graphql.NewClient("http://api.mountup.io/graphql")
+	client := graphql.NewClient(constants.ENDPOINT + "/graphql")
 
 	// make a request
 	req := graphql.NewRequest(`

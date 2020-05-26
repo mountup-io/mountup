@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"os"
+	"strings"
 	"syscall"
 )
 
@@ -19,9 +20,11 @@ var signupCmd = &cobra.Command{
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Username: ")
 		username, _ := reader.ReadString('\n')
+		username = strings.TrimSpace(username)
 
 		fmt.Print("Email: ")
 		email, _ := reader.ReadString('\n')
+		email = strings.TrimSpace(email)
 
 		fmt.Print("Password: ")
 		bytePassword, err := terminal.ReadPassword(syscall.Stdin)

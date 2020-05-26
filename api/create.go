@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/machinebox/graphql"
+	"github.com/mountup-io/mountup/constants"
 	"log"
 	"net/http"
 	"time"
@@ -22,7 +23,9 @@ type CreateVMForUserAccountResponseStruct struct {
 }
 
 func MakeCreateVMRequest(clientName string) (*VM, *PrivateKey, error) {
-	client := graphql.NewClient("http://api.mountup.io/graphql")
+	client := graphql.NewClient(constants.ENDPOINT+"/graphql", graphql.WithHTTPClient(&http.Client{
+		Timeout: 25 * time.Second,
+	}))
 
 	// make a request
 	req := graphql.NewRequest(`
@@ -80,7 +83,7 @@ func getAuthToken() (string, error) {
 	// Check validity of access_token
 	atExp, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", accessTokenExp)
 	if err != nil {
-		fmt.Println("failed to parse token expiration date")
+		fmt.Println("You are not logged in.")
 		return "", err
 	}
 	if atExp.After(time.Now()) {
@@ -90,7 +93,7 @@ func getAuthToken() (string, error) {
 	// Check validity of refresh_token
 	rtExp, err := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", refreshTokenExp)
 	if err != nil {
-		fmt.Println("failed to parse token expiration date")
+		fmt.Println("You are not logged in.")
 		return "", err
 	}
 
@@ -134,7 +137,7 @@ func getAuthToken() (string, error) {
 }
 
 func makeRefreshRequest(refreshToken string) (*http.Response, error) {
-	url := "http://api.mountup.io/refresh"
+	url := constants.ENDPOINT + "/refresh"
 
 	reqBody, err := json.Marshal(map[string]string{
 		"refresh_token": refreshToken,

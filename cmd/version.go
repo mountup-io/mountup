@@ -12,7 +12,7 @@ var versionCmd = &cobra.Command{
 	Short: "print mountup version",
 	Long:  `print mountup version`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mountup version 0.1.2")
+		fmt.Println("mountup version 0.1.3")
 	},
 }
 

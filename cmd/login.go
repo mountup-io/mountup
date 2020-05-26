@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mountup-io/mountup/api"
+	"github.com/mountup-io/mountup/constants"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
@@ -34,8 +35,8 @@ var loginCmd = &cobra.Command{
 		fmt.Printf("\n")
 
 		resp, err := makeLoginRequest(username, password)
-		if err != nil {
-			fmt.Println("error making login request")
+		if err != nil || resp.StatusCode != http.StatusOK {
+			fmt.Printf("error %d %s\n", resp.StatusCode, resp.Status)
 			return
 		}
 
@@ -80,7 +81,7 @@ func init() {
 }
 
 func makeLoginRequest(username string, password string) (*http.Response, error) {
-	url := "http://api.mountup.io/login"
+	url := constants.ENDPOINT + "/login"
 
 	reqBody, err := json.Marshal(map[string]string{
 		"username": username,
